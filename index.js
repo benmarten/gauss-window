@@ -13,7 +13,7 @@ const gauss = [
 // let result = getSmoothedArray(input, 3)
 // console.log(result)
 
-function getSmoothedArray(array, window = 3) {
+function getSmoothedArray(array, window = 3, round = false) {
     let result = []
     let corr_factor = getCorrection(window)
     for (let i = 0; i < array.length; i++) {
@@ -22,7 +22,11 @@ function getSmoothedArray(array, window = 3) {
         for (let j = start; j <= Math.abs(start); j++) {
             newNumber += getInputAtOffset(array, i, j) * gauss[Math.abs(j)]
         }
-        result.push(newNumber / corr_factor)
+        if (round) {
+            result.push(Math.round(newNumber / corr_factor))
+        } else {
+            result.push(newNumber / corr_factor)
+        }
     }
     return result
 }
