@@ -1,6 +1,5 @@
 'use strict'
 
-// const input = [3, 5, 0, 8, 4, 2, 6]
 const gauss = [
     0.3989422804014326779399, // 0
     0.2419707245191433497978, // -1, +1
@@ -10,25 +9,32 @@ const gauss = [
     1.486719514734297707908E-6
 ]
 
-// let result = getSmoothedArray(input, 3)
-// console.log(result)
+let result = getSmoothedArray([3, 5, 0, 8, 4, 2, 6], 5)
+console.log(result)
 
 function getSmoothedArray(array, window = 3, round = false) {
     let result = []
-    let corr_factor = getCorrection(window)
+    let oldSum = 0
+    let newSum = 0
     for (let i = 0; i < array.length; i++) {
         let start = 0 - (window - 1) / 2
         let newNumber = 0
         for (let j = start; j <= Math.abs(start); j++) {
             newNumber += getInputAtOffset(array, i, j) * gauss[Math.abs(j)]
         }
-        if (round) {
-            result.push(Math.round(newNumber / corr_factor))
-        } else {
-            result.push(newNumber / corr_factor)
-        }
+        oldSum += array[i]
+        newSum += newNumber
+        result.push(newNumber)
     }
-    return result
+
+    let corr_factor = oldSum / newSum
+    return result.map(item => {
+        if (round) {
+            return Math.round(item * corr_factor)
+        } else {
+            return item * corr_factor
+        }
+    })
 }
 
 function getCorrection(window) {
@@ -43,11 +49,9 @@ function getCorrection(window) {
 function getInputAtOffset(array, index, offset) {
     let pos = index + offset
     if (pos < 0) {
-        let newPos = array.length + pos
-        return array[newPos]
+        return array[0]
     } else if (pos >= array.length) {
-        let newPos = pos - array.length
-        return array[newPos]
+        return array[array.length -1]
     } else {
         return array[pos]
     }
