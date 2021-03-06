@@ -9,18 +9,17 @@ const gauss = [
     1.486719514734297707908E-6
 ]
 
-let result = getSmoothedArray([3, 5, 0, 8, 4, 2, 6], 5)
+let result = getSmoothedArray([3, 5, 0, 8, 4, 2, 6], 5, 2)
 console.log(result)
 
-function getSmoothedArray(array, window = 3, round = false) {
-    let result = []
-    let oldSum = 0
-    let newSum = 0
-    for (let i = 0; i < array.length; i++) {
-        let start = 0 - (window - 1) / 2
+function getSmoothedArray(array, window = 3, edge = 0, round = false) {
+    let result = []; let oldSum = 0; let newSum = 0
+    let windowWidth = Math.abs(0 - (window - 1) / 2)
+
+    for (let i = edge; i < array.length - edge; i++) {
         let newNumber = 0
-        for (let j = start; j <= Math.abs(start); j++) {
-            newNumber += getInputAtOffset(array, i, j) * gauss[Math.abs(j)]
+        for (let j = -windowWidth; j <= windowWidth; j++) {
+            newNumber += getInputAtOffset(array, i, j, edge) * gauss[Math.abs(j)]
         }
         oldSum += array[i]
         newSum += newNumber
@@ -28,22 +27,17 @@ function getSmoothedArray(array, window = 3, round = false) {
     }
 
     let corr_factor = oldSum / newSum
-    return result.map(item => {
-        if (round) {
-            return Math.round(item * corr_factor)
-        } else {
-            return item * corr_factor
-        }
-    })
-}
-
-function getCorrection(window) {
-    let start = 0 - (window - 1) / 2
-    let result = 0
-    for (let j = start; j <= Math.abs(start); j++) {
-        result += gauss[Math.abs(j)]
+    let final_result = []
+    for (let i = 0; i < edge; i++) {
+        final_result.push(array[i])
     }
-    return result
+    result.map(item => {
+        final_result.push(round ? Math.round(item * corr_factor) : item * corr_factor)
+    })
+    for (let i = array.length - edge; i < array.length; i++) {
+        final_result.push(array[i])
+    }
+    return final_result
 }
 
 function getInputAtOffset(array, index, offset) {
@@ -51,7 +45,7 @@ function getInputAtOffset(array, index, offset) {
     if (pos < 0) {
         return array[0]
     } else if (pos >= array.length) {
-        return array[array.length -1]
+        return array[array.length - 1]
     } else {
         return array[pos]
     }
