@@ -9,8 +9,25 @@ const gauss = [
     1.486719514734297707908E-6
 ]
 
-let result = getSmoothedArray([3, 5, 0, 8, 4, 2, 6], 5, 2)
-console.log(result)
+// console.log(getSmoothedArray([3, 5, 0, 8, 4, 2, 6], 5, 2))
+// console.log(getSmoothedArrayIgnoringNull([null, null, null, 3, 5, 0, 8, 4, 2, 6, null, null], 5, 2))
+
+function getSmoothedArrayIgnoringNull(array, window = 3, edge = 0, round = false) {
+    let result = []
+
+    // Find left non-null edge.
+    for (var i = 0; i < array.length; i++) {
+        if (array[i]) break;
+    }
+    // Find right non-null edge.
+    for (var j = array.length -1; j > 0; j--) {
+        if (array[j]) break;
+    }
+
+    let subArray = array.slice(i, j + 1)
+
+    return array.slice(0, i).concat(getSmoothedArray(subArray, window, edge, round)).concat(array.slice(j + 1))
+}
 
 function getSmoothedArray(array, window = 3, edge = 0, round = false) {
     let result = []; let oldSum = 0; let newSum = 0
@@ -51,4 +68,7 @@ function getInputAtOffset(array, index, offset) {
     }
 }
 
-module.exports = getSmoothedArray
+module.exports = {
+    getSmoothedArray: getSmoothedArray,
+    getSmoothedArrayIgnoringNull: getSmoothedArrayIgnoringNull
+}
